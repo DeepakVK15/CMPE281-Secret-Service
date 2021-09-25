@@ -10,7 +10,7 @@ import org.springframework.core.annotation.Order;
 import edu.sjsu.cmpe275.aop.SecretStatsImpl;
 
 @Aspect
-@Order(0)
+@Order(3)
 public class StatsAspect {
     /***
      * Following is a dummy implementation of this aspect.
@@ -18,16 +18,16 @@ public class StatsAspect {
      */
 
 	@Autowired SecretStatsImpl stats;
-	
+
 	@After("execution(public void edu.sjsu.cmpe275.aop.SecretService.*(..))")
 	public void dummyAfterAdvice(JoinPoint joinPoint) {
-		System.out.printf("After the executuion of the metohd %s\n", joinPoint.getSignature().getName());
+		System.out.printf("After the execution of the method %s\n", joinPoint.getSignature().getName());
 		//stats.resetStats();
 	}
 	
 	@Before("execution(public void edu.sjsu.cmpe275.aop.SecretService.*(..))")
 	public void dummyBeforeAdvice(JoinPoint joinPoint) {
-		System.out.printf("Doing stats before the executuion of the metohd %s\n", joinPoint.getSignature().getName());
+		System.out.printf("Doing stats before the execution of the method %s\n", joinPoint.getSignature().getName());
 	}
 	
 }

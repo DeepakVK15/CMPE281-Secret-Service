@@ -15,7 +15,8 @@ public class ValidationAspect {
      * Following is a dummy implementation of this aspect.
      * You are expected to provide an actual implementation based on the requirements, including adding/removing advices as needed.
      */
-    private static String id;
+    private static String createdBy;
+    private static String content;
 
     @Before("execution(public * edu.sjsu.cmpe275.aop.SecretService.*(..))")
     public void dummyAdvice(JoinPoint joinPoint) {
@@ -28,7 +29,8 @@ public class ValidationAspect {
         if (userId == null || userId.length() == 0 || secretContent == null || secretContent.length() > 128)
             throw new IllegalArgumentException();
         else {
-            id = userId;
+            createdBy = userId;
+            content = secretContent;
             if(secretContent.length()> SecretStatsImpl.lengthOfLongestSecret)
                 SecretStatsImpl.lengthOfLongestSecret = secretContent.length();
         }
@@ -55,7 +57,8 @@ public class ValidationAspect {
             throw new IllegalArgumentException();
     }
 
-    public static String getId() {
-        return id;
+    public static String getCreatedBy() {
+        return createdBy;
     }
+    public static String getContent() { return content;}
 }
