@@ -1,36 +1,42 @@
 package edu.sjsu.cmpe275.aop.aspect;
 
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.AfterThrowing;
-import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.*;
 import org.springframework.core.annotation.Order;
-import org.aspectj.lang.annotation.Around;
+
+import java.io.IOException;
 
 @Aspect
-@Order(4)
+@Order(1)
 public class RetryAspect {
     /***
      * Following is a dummy implementation of this aspect.
      * You are expected to provide an actual implementation based on the requirements, including adding/removing advices as needed.
      */
 
-	@Around("execution(public void edu.sjsu.cmpe275.aop.SecretService.*(..))")
-	public void dummyAdvice(ProceedingJoinPoint joinPoint) {
-		System.out.printf("Retry aspect prior to the execution of the method %s\n", joinPoint.getSignature().getName());
+    @Around("execution(public * edu.sjsu.cmpe275.aop.SecretService.*(..))")
+	public  Object retrySecretService(ProceedingJoinPoint joinPoint) throws Throwable {
 		Object result = null;
-		try {
-			result = joinPoint.proceed();
-			System.out.printf("Finished the execution of the method %s with result %s\n", joinPoint.getSignature().getName(), result);
-		} catch (Throwable e) {
-			e.printStackTrace();
-			System.out.printf("Aborted the execution of the method %s\n", joinPoint.getSignature().getName());
+		int retry = 0;
+			for(;;) {
+				try {
+					result = joinPoint.proceed();
+					System.out.printf("Finished the execution of the method %s which returned %s\n", joinPoint.getSignature().getName(), result);
+					return result;
+				} catch (Exception e) {
+					retry++;
+					if (retry > 2 || !(e instanceof IOException)) {
+						e.printStackTrace();
+						System.out.printf("Aborted the execution of the method %s\n", joinPoint.getSignature().getName());
+						throw new IOException();
+					}
+					else{
+						//1, 2
+						System.out.printf("Execution failed because of IO exception, retrying after 500ms.\n");
+						Thread.sleep(500);
+					}
+				}
+			}
+
 		}
-	}
-
-//	@AfterThrowing(value = "execution(* *(..))", throwing = "e")
-//	public void log(JoinPoint joinPoint, Throwable e){
-//		System.out.println("Some logging stuff");
-//	}
-
 }

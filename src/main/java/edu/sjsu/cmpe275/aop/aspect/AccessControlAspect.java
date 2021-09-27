@@ -1,6 +1,7 @@
 package edu.sjsu.cmpe275.aop.aspect;
 
 import edu.sjsu.cmpe275.aop.NotAuthorizedException;
+import edu.sjsu.cmpe275.aop.SecretStatsImpl;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -9,7 +10,7 @@ import org.springframework.core.annotation.Order;
 import java.util.*;
 
 @Aspect
-@Order(2)
+@Order(3)
 public class AccessControlAspect {
     /***
      * Following is a dummy implementation of this aspect.
@@ -69,13 +70,16 @@ public class AccessControlAspect {
     public void storeSecret(UUID id) {
         Secret secret = new Secret(id, ValidationAspect.getCreatedBy(), ValidationAspect.getContent());
         secrets.put(id, secret);
+
+        if(secret.getContent().length() > SecretStatsImpl.lengthOfLongestSecret)
+            SecretStatsImpl.lengthOfLongestSecret = secret.getContent().length();
+
         if (!users.containsKey(secret.createdBy))
             users.put(secret.createdBy, new User(secret.createdBy));
     }
 
     @Before("args(userId, secretId, targetUserId) && execution(public * shareSecret(..)))")
     public void validateShareSecret(String userId, UUID secretId, String targetUserId) {
-        System.out.println("validate sharing");
         Set<String> authorisedUsers = secrets.get(secretId).authorisedUsers;
         if (!secrets.containsKey(secretId) || !authorisedUsers.contains(userId))
             throw new NotAuthorizedException();

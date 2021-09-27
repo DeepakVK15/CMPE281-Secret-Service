@@ -1,6 +1,5 @@
 package edu.sjsu.cmpe275.aop.aspect;
 
-import edu.sjsu.cmpe275.aop.SecretStatsImpl;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -9,7 +8,7 @@ import org.springframework.core.annotation.Order;
 import java.util.*;
 
 @Aspect
-@Order(1)
+@Order(2)
 public class ValidationAspect {
     /***
      * Following is a dummy implementation of this aspect.
@@ -25,28 +24,22 @@ public class ValidationAspect {
 
     @Before("args(userId, secretContent) && execution(public * createSecret(..)))")
     public void validateCreateSecret(String userId, String secretContent) {
-        System.out.println("validate creation");
         if (userId == null || userId.length() == 0 || secretContent == null || secretContent.length() > 128)
             throw new IllegalArgumentException();
         else {
             createdBy = userId;
             content = secretContent;
-            if(secretContent.length()> SecretStatsImpl.lengthOfLongestSecret)
-                SecretStatsImpl.lengthOfLongestSecret = secretContent.length();
         }
     }
 
     @Before("args(userId, secretId, targetUserId) && execution(public * shareSecret(..)))")
     public void validateShareSecret(String userId, UUID secretId, String targetUserId) {
-        System.out.println("validate sharing");
-
         if (userId == null || userId.length() == 0 || targetUserId == null || targetUserId.length() == 0 || secretId == null || targetUserId.equals(userId))
             throw new IllegalArgumentException();
     }
 
     @Before("args(userId, secretId) && execution(public * readSecret(..)))")
     public void validateReadSecret(String userId, UUID secretId) {
-        System.out.println("validate read");
         if (userId == null || userId.length() == 0 || secretId == null)
             throw new IllegalArgumentException();
     }
