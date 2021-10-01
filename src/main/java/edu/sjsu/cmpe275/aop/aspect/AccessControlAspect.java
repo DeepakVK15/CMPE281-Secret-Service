@@ -16,6 +16,10 @@ public class AccessControlAspect {
      * Following is a dummy implementation of this aspect.
      * You are expected to provide an actual implementation based on the requirements, including adding/removing advices as needed.
      */
+    private  String userId;
+    private  UUID secretId;
+    private  String targetUserId;
+
     public class Secret {
         private final Set<String> authorisedUsers;
         private final Set<String> sharedWith;
@@ -42,7 +46,7 @@ public class AccessControlAspect {
 
     }
 
-    public class User {
+    public  class User {
         private String name;
         private int trustWorthyScore;
         private int secretKeeperScore;
@@ -84,17 +88,33 @@ public class AccessControlAspect {
         if (!secrets.containsKey(secretId) || !authorisedUsers.contains(userId))
             throw new NotAuthorizedException();
         else {
-            if (!userId.equals(secrets.get(secretId).createdBy)) {
+            this.userId = userId;
+            this.secretId = secretId;
+            this.targetUserId = targetUserId;
+        }
+    }
+
+    @AfterReturning(pointcut = "execution(public * shareSecret(..))")
+    public void afterShareSecret(){
+        if (!userId.equals(secrets.get(secretId).createdBy)) {
                 users.get(userId).secretKeeperScore++;
             }
             if (!users.containsKey(targetUserId)) {
                 User user = new User(targetUserId);
                 users.put(targetUserId, user);
             }
+            if(secrets.get(secretId).readBy.contains(targetUserId))
+                secrets.get(secretId).authorisedUsers.add(targetUserId);
+            else
+                secrets.get(secretId).sharedWith.add(targetUserId);
+
             users.get(targetUserId).trustWorthyScore++;
-            secrets.get(secretId).sharedWith.add(targetUserId);
-        }
+
+            this.secretId = null;
+            this.targetUserId = null;
+            this.userId =null;
     }
+
 
     @Before("args(userId, secretId) && execution(public * readSecret(..)))")
     public void validateReadSecret(String userId, UUID secretId) {
@@ -104,23 +124,45 @@ public class AccessControlAspect {
         Secret secret = secrets.get(secretId);
         if (secret.authorisedUsers.contains(userId) || secret.sharedWith.contains(userId)) {
             if (!userId.equals(secret.createdBy)) {
-                secret.authorisedUsers.add(userId);
-                secret.sharedWith.remove(userId);
-                secret.readBy.add(userId);
+//                secret.authorisedUsers.add(userId);
+//                secret.sharedWith.remove(userId);
+//                secret.readBy.add(userId);
+                this.userId = userId;
+                this.secretId = secretId;
             }
         } else
             throw new NotAuthorizedException();
 
     }
 
+    @AfterReturning(pointcut = "execution(public * readSecret(..))" , returning = "secret")
+    public void afterSecretRead(String secret) {
+        if(secret!=null){
+            secrets.get(secretId).authorisedUsers.add(userId);
+            secrets.get(secretId).sharedWith.remove(userId);
+            secrets.get(secretId).readBy.add(userId);
+        }
+        this.secretId = null;
+        this.userId = null;
+    }
+
     @Before("args(userId, secretId,targetUserId) && execution(public * unshareSecret(..)))")
-    public void validateUnShareSecret(String userId, UUID secretId, String targetUserId) {
+    public void validateUnshareSecret(String userId, UUID secretId, String targetUserId) {
         if (!secrets.containsKey(secretId) || !secrets.get(secretId).createdBy.equals(userId) || (!secrets.get(secretId).authorisedUsers.contains(targetUserId) && !secrets.get(secretId).sharedWith.contains(targetUserId)))
             throw new NotAuthorizedException();
         else {
+            this.secretId = secretId;
+            this.targetUserId = targetUserId;
+        }
+    }
+
+    @AfterReturning(pointcut = "execution(public * unshareSecret(..))")
+    public void afterUnshareSecret(){
             Secret secret = secrets.get(secretId);
             secret.authorisedUsers.remove(targetUserId);
             secret.sharedWith.remove(targetUserId);
-        }
+
+        this.secretId = null;
+        this.targetUserId = null;
     }
 }

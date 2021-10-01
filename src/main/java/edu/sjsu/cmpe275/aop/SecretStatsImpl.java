@@ -63,7 +63,8 @@ public class SecretStatsImpl implements SecretStats {
 				else if(temp==maxScore){
 					if(resultId!=null)
 						resultId = resultId.compareTo(name)>0?name:resultId;
-					resultId=name;
+					else
+						resultId=name;
 				}
 			}
 		}
@@ -87,13 +88,9 @@ public class SecretStatsImpl implements SecretStats {
 					if (temp > 0)
 						bestSecret = id;
 				}
-
 			}
 		}
 
 		return bestSecret;
 	}
 }
-
-
-
