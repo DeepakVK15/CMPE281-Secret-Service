@@ -24,7 +24,7 @@ public class ValidationAspect {
 
     @Before("args(userId, secretContent) && execution(public * createSecret(..)))")
     public void validateCreateSecret(String userId, String secretContent) {
-        if (userId == null || userId.length() == 0 || secretContent == null || secretContent.length() > 128)
+        if (userId == null || secretContent == null || secretContent.length() > 128)
             throw new IllegalArgumentException();
         else {
             createdBy = userId;
@@ -34,13 +34,13 @@ public class ValidationAspect {
 
     @Before("args(userId, secretId, targetUserId) && execution(public * shareSecret(..)))")
     public void validateShareSecret(String userId, UUID secretId, String targetUserId) {
-        if (userId == null || userId.length() == 0 || targetUserId == null || targetUserId.length() == 0 || secretId == null || targetUserId.equals(userId))
+        if (userId == null || targetUserId == null || secretId == null || targetUserId.equals(userId))
             throw new IllegalArgumentException();
     }
 
     @Before("args(userId, secretId) && execution(public * readSecret(..)))")
     public void validateReadSecret(String userId, UUID secretId) {
-        if (userId == null || userId.length() == 0 || secretId == null)
+        if (userId == null || secretId == null)
             throw new IllegalArgumentException();
     }
 
