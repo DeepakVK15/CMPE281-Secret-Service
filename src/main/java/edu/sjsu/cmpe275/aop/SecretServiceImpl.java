@@ -15,6 +15,7 @@ public class SecretServiceImpl implements SecretService {
 	 */
 
 	Map<UUID, String> secrets = new HashMap<UUID, String>();
+	int temp =1;
 
 	@Override
 	public UUID createSecret(String userId, String secretContent) throws IOException, IllegalArgumentException {

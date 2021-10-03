@@ -121,7 +121,6 @@ public class StatsAspect {
 		else
 			secrets.get(secretId).sharedWith.add(targetUserId);
 
-		if(!targetUserId.equals(secrets.get(secretId).createdBy)) {
 			Map<String, Set<UUID>> userScore = users.get(targetUserId).trustWorthyScore;
 
 			if (!userScore.containsKey(userId))
@@ -129,7 +128,7 @@ public class StatsAspect {
 
 			Set<UUID> temp = userScore.get(userId);
 			temp.add(secretId);
-		}
+
 
 		AccessControlAspect.userID = null;
 		AccessControlAspect.targetUserID = null;
@@ -140,10 +139,12 @@ public class StatsAspect {
 	public void afterSecretRead(String secret) {
 		UUID secretId = AccessControlAspect.secretID;
 		String userId = AccessControlAspect.userID;
-		if(secret!=null){
-			secrets.get(secretId).authorisedUsers.add(userId);
-			secrets.get(secretId).sharedWith.remove(userId);
-			secrets.get(secretId).readBy.add(userId);
+
+		Secret secretObj = secrets.get(secretId);
+		if(!userId.equals(secretObj.getCreatedBy())){
+			secretObj.authorisedUsers.add(userId);
+			secretObj.sharedWith.remove(userId);
+			secretObj.readBy.add(userId);
 		}
 		AccessControlAspect.secretID = null;
 		AccessControlAspect.userID = null;

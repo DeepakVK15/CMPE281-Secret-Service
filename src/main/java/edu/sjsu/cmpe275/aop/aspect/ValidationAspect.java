@@ -46,7 +46,7 @@ public class ValidationAspect {
 
     @Before("args(userId, secretId,targetUserId) && execution(public * unshareSecret(..)))")
     public void validateUnShareSecret(String userId, UUID secretId, String targetUserId) {
-        if (userId == null || targetUserId == null || secretId == null || userId.equals(targetUserId))
+        if (userId == null || targetUserId == null || secretId == null)
             throw new IllegalArgumentException();
     }
 
