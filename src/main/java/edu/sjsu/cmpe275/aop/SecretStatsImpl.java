@@ -1,24 +1,24 @@
 package edu.sjsu.cmpe275.aop;
 
 import edu.sjsu.cmpe275.aop.aspect.AccessControlAspect;
+import edu.sjsu.cmpe275.aop.aspect.StatsAspect;
 
 import java.util.Map;
 import java.util.UUID;
 
 public class SecretStatsImpl implements SecretStats {
     /***
-     * This is a dummy implementation only.
-     * You are expected to provide an actual implementation based on the requirements.
+     * Calculates Stats for secret created/read/shared/un-shared
      */
     public static int lengthOfLongestSecret = 0;
-	Map<String, AccessControlAspect.User> users = AccessControlAspect.users;
-	Map<UUID, AccessControlAspect.Secret> secrets = AccessControlAspect.secrets;
+	Map<String, StatsAspect.User> users = AccessControlAspect.users;
+	Map<UUID, StatsAspect.Secret> secrets = AccessControlAspect.secrets;
 
 	@Override
 	public void resetStatsAndSystem() {
 		// TODO Auto-generated method stub
-		AccessControlAspect.users.clear();
-		AccessControlAspect.secrets.clear();
+		StatsAspect.users.clear();
+		StatsAspect.secrets.clear();
 		lengthOfLongestSecret = 0;
 	}
 
@@ -53,9 +53,9 @@ public class SecretStatsImpl implements SecretStats {
 		int maxScore = 0;
 		String resultId = null;
 		for(String name:users.keySet()){
-			int keeperScore = users.get(name).getSecretKeeperScore();
-			if(keeperScore!=0) {
-				int temp = keeperScore / users.get(name).getTrustWorthyScore();
+			int trustScore = users.get(name).getTrustWorthyScore();
+			if(trustScore!=0) {
+				int temp = users.get(name).getSecretKeeperScore() / trustScore;
 				if(temp>maxScore) {
 					maxScore = temp;
 					resultId = name;

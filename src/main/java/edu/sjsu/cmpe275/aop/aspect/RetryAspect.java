@@ -16,7 +16,7 @@ public class RetryAspect {
 
     @Around("execution(public * edu.sjsu.cmpe275.aop.SecretService.*(..))")
 	public Object retrySecretService(ProceedingJoinPoint joinPoint) throws Throwable {
-		Object result = null;
+		Object result;
 		int retry = 0;
 			for(;;) {
 				try {
@@ -26,7 +26,7 @@ public class RetryAspect {
 				} catch (Exception e) {
 					retry++;
 					if (retry <= 2 && (e instanceof IOException)) {
-						System.out.printf("Execution failed because of IO exception, retrying after 500ms.\n");
+						System.out.print("Execution failed because of IO exception, retrying after 500ms.\n");
 						Thread.sleep(500);
 					}
 					else if(e instanceof IOException){

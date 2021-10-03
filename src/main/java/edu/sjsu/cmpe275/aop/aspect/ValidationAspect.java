@@ -11,8 +11,8 @@ import java.util.*;
 @Order(2)
 public class ValidationAspect {
     /***
-     * Following is a dummy implementation of this aspect.
-     * You are expected to provide an actual implementation based on the requirements, including adding/removing advices as needed.
+     *
+     * Validates arguments of SecretService methods
      */
     private static String createdBy;
     private static String content;
