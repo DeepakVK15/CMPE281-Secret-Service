@@ -43,8 +43,8 @@ public class AccessControlAspect {
 
         StatsAspect.Secret secret = StatsAspect.secrets.get(secretId);
         if (secret.getAuthorisedUsers().contains(userId) || secret.getSharedWith().contains(userId)) {
-                userID = userId;
-                secretID = secretId;
+            userID = userId;
+            secretID = secretId;
         } else
             throw new NotAuthorizedException();
 
@@ -54,9 +54,9 @@ public class AccessControlAspect {
     public void validateUnshareSecret(String userId, UUID secretId, String targetUserId) {
         if (!secrets.containsKey(secretId) || !secrets.get(secretId).getCreatedBy().equals(userId))
             throw new NotAuthorizedException();
-        if(userId.equals(targetUserId))
+        if (userId.equals(targetUserId))
             throw new IllegalArgumentException();
-        if(!secrets.get(secretId).getAuthorisedUsers().contains(targetUserId) && !secrets.get(secretId).getSharedWith().contains(targetUserId))
+        if (!secrets.get(secretId).getAuthorisedUsers().contains(targetUserId) && !secrets.get(secretId).getSharedWith().contains(targetUserId))
             throw new NotAuthorizedException();
         else {
             secretID = secretId;

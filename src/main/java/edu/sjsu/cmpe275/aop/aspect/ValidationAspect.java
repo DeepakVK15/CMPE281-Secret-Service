@@ -11,7 +11,6 @@ import java.util.*;
 @Order(2)
 public class ValidationAspect {
     /***
-     *
      * Validates arguments of SecretService methods
      */
     private static String createdBy;
@@ -53,5 +52,8 @@ public class ValidationAspect {
     public static String getCreatedBy() {
         return createdBy;
     }
-    public static String getContent() { return content;}
+
+    public static String getContent() {
+        return content;
+    }
 }
